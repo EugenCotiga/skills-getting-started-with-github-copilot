@@ -17,23 +17,35 @@ client = TestClient(app_module.app)
 
 
 def test_unregister_participant_from_activity():
+    # Arrange
+    activity_name = "Chess Club"
+    email = "michael@mergington.edu"
+
+    # Act
     response = client.delete(
-        "/activities/Chess Club/signup",
-        params={"email": "michael@mergington.edu"},
+        f"/activities/{activity_name}/signup",
+        params={"email": email},
     )
 
+    # Assert
     assert response.status_code == 200
     data = response.json()
     assert "unregistered" in data["message"].lower()
 
     activities = client.get("/activities").json()
-    assert "michael@mergington.edu" not in activities["Chess Club"]["participants"]
+    assert email not in activities[activity_name]["participants"]
 
 
 def test_unregister_unknown_participant_returns_404():
+    # Arrange
+    activity_name = "Chess Club"
+    email = "missing@mergington.edu"
+
+    # Act
     response = client.delete(
-        "/activities/Chess Club/signup",
-        params={"email": "missing@mergington.edu"},
+        f"/activities/{activity_name}/signup",
+        params={"email": email},
     )
 
+    # Assert
     assert response.status_code == 404
